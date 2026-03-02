@@ -23,12 +23,42 @@ export const CartProvider = ({ children }) => {
   const addToCart = (item) => {
     const exists = cart.find((i) => i.id === item.id);
     if (exists) {
-      toast.error("Item already in cart");
+      // Item exists, increase quantity
+      setCart(
+        cart.map((i) =>
+          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i,
+        ),
+      );
+      toast.success(`${item.title} quantity increased!`);
+    } else {
+      // Add new item with quantity 1
+      setCart([...cart, { ...item, quantity: 1 }]);
+      toast.success(`${item.title} added to Cart!`);
+    }
+  };
+
+  const updateQuantity = (id, quantity) => {
+    if (quantity <= 0) {
+      removeFromCart(id);
       return;
     }
 
-    setCart([...cart, item]);
-    toast.success("Added to Cart");
+    setCart(
+      cart.map((item) =>
+        item.id === id ? { ...item, quantity: quantity } : item,
+      ),
+    );
+  };
+
+  const getTotalItems = () => {
+    return cart.reduce((total, item) => total + (item.quantity || 1), 0);
+  };
+
+  const getTotalPrice = () => {
+    return cart.reduce(
+      (total, item) => total + item.price * (item.quantity || 1),
+      0,
+    );
   };
 
   const removeFromCart = (id) => {
@@ -46,9 +76,12 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider
       value={{
         cart,
-        setCart, // ✅ IMPORTANT
+        setCart,
         addToCart,
         removeFromCart,
+        updateQuantity,
+        getTotalItems,
+        getTotalPrice,
         orders,
         placeOrder,
       }}

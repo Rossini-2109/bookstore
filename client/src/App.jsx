@@ -1,7 +1,8 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { useState, useContext } from "react";
-import { CartContext } from "./context/CartContext";
-import Payment from "./pages/Payment"; 
+import { CartContext, CartProvider } from "./context/CartContext";
+import { AuthProvider } from "./context/AuthContext";
+import Payment from "./pages/Payment";
 import Admin from "./pages/Admin";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -19,18 +20,20 @@ import Orders from "./pages/Orders";
 import Cart from "./pages/Cart";
 import BookDetails from "./pages/BookDetails";
 
-function App() {
+function AppContent() {
   const [search, setSearch] = useState("");
   const [dark, setDark] = useState(false);
-  const { addToCart } = useContext(CartContext);
   const role = localStorage.getItem("role");
+  const location = useLocation();
+
+  // Pages where we don't want to show the footer
+  const noFooterPages = ["/login", "/signup"];
+  const showFooter = !noFooterPages.includes(location.pathname);
 
   return (
     <div
       className={
-        dark
-          ? "dark bg-black text-white min-h-screen"
-          : "min-h-screen"
+        dark ? "dark bg-black text-white min-h-screen" : "min-h-screen"
       }
     >
       <Navbar
@@ -44,10 +47,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route
-          path="/books"
-          element={<Books search={search} addToCart={addToCart} />}
-        />
+        <Route path="/books" element={<Books search={search} />} />
         <Route path="/book/:id" element={<BookDetails />} />
         <Route path="/toys" element={<Toys />} />
         <Route path="/stationery" element={<Stationery />} />
@@ -61,8 +61,18 @@ function App() {
         />
       </Routes>
 
-      <Footer />
+      {showFooter && <Footer />}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <CartProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </CartProvider>
   );
 }
 
