@@ -1,17 +1,20 @@
-import { FaShoppingCart, FaStar } from "react-icons/fa";
+import { FaShoppingCart, FaRegStar, FaPlus, FaMinus } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { CartContext } from "../context/CartContext";
 
-const BookCard = ({ item, addToCart }) => {
+const BookCard = ({ item }) => {
   const [open, setOpen] = useState(false);
+  const { cart, addToCart, updateQuantity, removeFromCart } =
+    useContext(CartContext);
+
+  // Check if item is in cart and get its quantity
+  const cartItem = cart.find((cartItem) => cartItem.id === item.id);
+  const quantity = cartItem?.quantity || 0;
 
   return (
     <>
-      <motion.div
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="bg-white rounded-xl shadow-md p-4 w-64 relative"
-      >
+      <motion.div className="bg-white rounded-xl shadow-md p-4 w-64 relative">
         {/* Image Section */}
         <div className="relative">
           <img
@@ -41,26 +44,43 @@ const BookCard = ({ item, addToCart }) => {
         {/* Star Rating */}
         <div className="flex text-yellow-400 text-sm mt-1">
           {[...Array(item.rating || 4)].map((_, i) => (
-            <FaStar key={i} />
+            <FaRegStar key={i} />
           ))}
         </div>
 
-        <p className="text-yellow-600 font-semibold mt-2">
-          ₹{item.price}
-        </p>
+        <p className="text-yellow-600 font-semibold mt-2">₹{item.price}</p>
 
-        <button
-          disabled={item.stock === 0}
-          onClick={() => addToCart(item)}
-          className={`w-full mt-3 py-2 rounded flex items-center justify-center gap-2 ${
-            item.stock === 0
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-yellow-500 hover:bg-yellow-600 text-white"
-          }`}
-        >
-          <FaShoppingCart />
-          {item.stock === 0 ? "Unavailable" : "Add to Cart"}
-        </button>
+        {/* Cart Controls */}
+        {quantity > 0 ? (
+          <div className="mt-3 flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-2">
+            <button
+              onClick={() => updateQuantity(item.id, quantity - 1)}
+              className="p-1 rounded hover:bg-green-200 transition-colors"
+            >
+              <FaMinus size={12} className="text-green-600" />
+            </button>
+            <span className="font-bold text-green-800 text-sm">{quantity}</span>
+            <button
+              onClick={() => updateQuantity(item.id, quantity + 1)}
+              className="p-1 rounded hover:bg-green-200 transition-colors"
+            >
+              <FaPlus size={12} className="text-green-600" />
+            </button>
+          </div>
+        ) : (
+          <button
+            disabled={item.stock === 0}
+            onClick={() => addToCart(item)}
+            className={`w-full mt-3 py-2 rounded flex items-center justify-center gap-2 ${
+              item.stock === 0
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-yellow-500 hover:bg-yellow-600 text-white"
+            }`}
+          >
+            <FaShoppingCart />
+            {item.stock === 0 ? "Unavailable" : "Add to Cart"}
+          </button>
+        )}
 
         <button
           onClick={() => setOpen(true)}

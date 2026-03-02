@@ -1,10 +1,7 @@
-import { useContext, useEffect } from "react";
-import { CartContext } from "../context/CartContext";
+import { useEffect } from "react";
 import BookCard from "./BookCard";
 
 const BestSeller = () => {
-  const { addToCart } = useContext(CartContext);
-
   const books = [
     {
       id: 1,
@@ -13,7 +10,7 @@ const BestSeller = () => {
       discount: 20,
       rating: 5,
       stock: 10,
-      image: "https://m.media-amazon.com/images/I/81ANaVZk5LL.jpg"
+      image: "https://m.media-amazon.com/images/I/81ANaVZk5LL.jpg",
     },
     {
       id: 2,
@@ -21,7 +18,7 @@ const BestSeller = () => {
       price: 399,
       rating: 4,
       stock: 5,
-      image: "https://m.media-amazon.com/images/I/81bsw6fnUiL.jpg"
+      image: "https://m.media-amazon.com/images/I/81bsw6fnUiL.jpg",
     },
     {
       id: 3,
@@ -29,7 +26,7 @@ const BestSeller = () => {
       price: 299,
       rating: 4,
       stock: 0,
-      image: "https://m.media-amazon.com/images/I/71aFt4+OTOL.jpg"
+      image: "https://m.media-amazon.com/images/I/71aFt4+OTOL.jpg",
     },
     {
       id: 4,
@@ -37,8 +34,8 @@ const BestSeller = () => {
       price: 599,
       rating: 5,
       stock: 8,
-      image: "https://m.media-amazon.com/images/I/81iqZ2HHD-L.jpg"
-    }
+      image: "https://m.media-amazon.com/images/I/81iqZ2HHD-L.jpg",
+    },
   ];
 
   // Auto scroll
@@ -47,7 +44,10 @@ const BestSeller = () => {
     const interval = setInterval(() => {
       if (container) {
         container.scrollLeft += 300;
-        if (container.scrollLeft >= container.scrollWidth - container.clientWidth) {
+        if (
+          container.scrollLeft >=
+          container.scrollWidth - container.clientWidth
+        ) {
           container.scrollLeft = 0;
         }
       }
@@ -65,11 +65,7 @@ const BestSeller = () => {
         className="flex overflow-x-auto space-x-6 scroll-smooth"
       >
         {books.map((book) => (
-          <BookCard
-            key={book.id}
-            item={book}
-            addToCart={addToCart}
-          />
+          <BookCard key={book.id} item={book} />
         ))}
       </div>
     </div>

@@ -1,6 +1,9 @@
 import BookCard from "../components/BookCard";
+import { useContext } from "react";
+import { CartContext } from "../context/CartContext";
 
 const Toys = () => {
+  const { cart } = useContext(CartContext);
   const toys = [
     {
       id: 1,
@@ -14,7 +17,8 @@ const Toys = () => {
       title: "Puzzle Game",
       author: "Fun Games",
       price: 499,
-      image: "https://tse2.mm.bing.net/th/id/OIP.CsrWzB0UViKHfcvrjVIWxAHaEo?rs=1&pid=ImgDetMain&o=7&rm=3",
+      image:
+        "https://tse2.mm.bing.net/th/id/OIP.CsrWzB0UViKHfcvrjVIWxAHaEo?rs=1&pid=ImgDetMain&o=7&rm=3",
     },
     {
       id: 3,
@@ -27,9 +31,7 @@ const Toys = () => {
 
   return (
     <div className="p-10 min-h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold mb-8 text-center">
-        Toys Collection
-      </h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">Toys Collection</h1>
 
       <div className="flex flex-wrap gap-8 justify-center">
         {toys.map((toy) => (

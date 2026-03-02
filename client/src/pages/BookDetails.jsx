@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaStar } from "react-icons/fa";
+import { FaRegStar, FaPlus, FaMinus } from "react-icons/fa";
 import { useContext, useState, useEffect } from "react";
 import { CartContext } from "../context/CartContext";
 
@@ -7,10 +7,15 @@ const BookDetails = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const book = location.state;
-  const { addToCart } = useContext(CartContext);
+  const { cart, addToCart, updateQuantity, removeFromCart } =
+    useContext(CartContext);
 
   const [reviews, setReviews] = useState([]);
   const [comment, setComment] = useState("");
+
+  // Check if item is in cart and get its quantity
+  const cartItem = cart.find((cartItem) => cartItem.id === book?.id);
+  const quantity = cartItem?.quantity || 0;
 
   useEffect(() => {
     if (book) {
@@ -34,10 +39,7 @@ const BookDetails = () => {
     const newReviews = [...reviews, comment];
     setReviews(newReviews);
 
-    localStorage.setItem(
-      `reviews-${book.id}`,
-      JSON.stringify(newReviews)
-    );
+    localStorage.setItem(`reviews-${book.id}`, JSON.stringify(newReviews));
 
     setComment("");
   };
@@ -45,7 +47,7 @@ const BookDetails = () => {
   // MOCK RELATED BOOKS (same author logic)
   const allBooks = JSON.parse(localStorage.getItem("allBooks")) || [];
   const relatedBooks = allBooks.filter(
-    (b) => b.author === book.author && b.id !== book.id
+    (b) => b.author === book.author && b.id !== book.id,
   );
 
   return (
@@ -71,7 +73,7 @@ const BookDetails = () => {
           {/* Rating */}
           <div className="flex text-yellow-400 mt-3">
             {[...Array(book.rating || 4)].map((_, i) => (
-              <FaStar key={i} />
+              <FaRegStar key={i} />
             ))}
           </div>
 
@@ -79,16 +81,38 @@ const BookDetails = () => {
             ₹{book.price}
           </p>
 
-          <p className="mt-4 text-gray-700">
-            {book.description}
-          </p>
+          <p className="mt-4 text-gray-700">{book.description}</p>
 
-          <button
-            onClick={() => addToCart(book)}
-            className="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded"
-          >
-            Add to Cart
-          </button>
+          {/* Cart Controls */}
+          {quantity > 0 ? (
+            <div className="mt-6 flex items-center gap-4">
+              <div className="flex items-center bg-green-50 border border-green-200 rounded-lg p-1">
+                <button
+                  onClick={() => updateQuantity(book.id, quantity - 1)}
+                  className="p-2 rounded hover:bg-green-200 transition-colors"
+                >
+                  <FaMinus size={14} className="text-green-600" />
+                </button>
+                <span className="font-bold text-green-800 px-4 py-2">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => updateQuantity(book.id, quantity + 1)}
+                  className="p-2 rounded hover:bg-green-200 transition-colors"
+                >
+                  <FaPlus size={14} className="text-green-600" />
+                </button>
+              </div>
+              <span className="text-sm text-gray-600">In Cart</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => addToCart(book)}
+              className="mt-6 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded"
+            >
+              Add to Cart
+            </button>
+          )}
         </div>
       </div>
 
@@ -126,27 +150,21 @@ const BookDetails = () => {
       {/* Related Books */}
       {relatedBooks.length > 0 && (
         <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-4">
-            Related Books
-          </h2>
+          <h2 className="text-2xl font-bold mb-4">Related Books</h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {relatedBooks.map((item) => (
               <div
                 key={item.id}
                 className="bg-white p-3 rounded shadow cursor-pointer"
-                onClick={() =>
-                  navigate("/book-details", { state: item })
-                }
+                onClick={() => navigate("/book-details", { state: item })}
               >
                 <img
                   src={item.image}
                   className="h-32 w-full object-cover rounded"
                   alt={item.title}
                 />
-                <p className="text-sm mt-2 font-medium">
-                  {item.title}
-                </p>
+                <p className="text-sm mt-2 font-medium">{item.title}</p>
               </div>
             ))}
           </div>
